@@ -1,24 +1,33 @@
-import logo from './logo.svg';
-import './App.css';
-
+import {useRef, useEffect, useState} from 'react'
+import {BrowserRouter, Route, Routes} from "react-router-dom"
+import "./App.css";
+import Navigation from "./components/Navigation";
+import Login from "./pages/Login"
+import Home from "./pages/Home"
+import Chat from "./pages/Chat"
+import io from "socket.io-client"
 function App() {
+  const socketRef = useRef();
+  const [id, setId] = useState();
+  const [mess, setMess] = useState([]);
+  useEffect(()=>{
+    socketRef.current = io.connect('http://localhost:3000')
+    socketRef.current.on('getId', data => {
+      setId(data)
+    })
+    // socketRef.current.on('room-messages', dataGot => {
+    //   setMess(oldMsgs => [...oldMsgs, dataGot.data])
+    // })
+  }, [])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Navigation />
+      <Routes>
+        <Route path="/" element={<Home/>} />
+        <Route path="/login" element={<Login/>} />
+        <Route path="/chat" element={<Chat/>} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
