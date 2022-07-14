@@ -10,7 +10,7 @@ function Login() {
           md={7}
           className="d-flex align-items-center justify-content-center flex-direction-column"
         >
-          <a href="http://localhost:3000/auth/google">
+          <a href="http://localhost:5000/auth/google">
             <Button variant="primary">Login with Google</Button>
           </a>
         </Col>
