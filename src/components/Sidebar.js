@@ -3,13 +3,16 @@ import { Button, Container, ListGroup } from "react-bootstrap";
 import "./Sidebar.css";
 import conversationApi from "./../utils/api-helper/conversationapi";
 import Modal from "./Modal";
-import { current } from "@reduxjs/toolkit";
 import ReceiverBox from "./ReceiverBox";
 const Sidebar = (props) => {
-  const { userId } = props;
-  const [conversations, setConversations] = useState([]);
+  const {
+    userId,
+    conversations,
+    onLoadData,
+    currentReceiver,
+    setCurrentReceiver,
+  } = props;
   const [showModal, toggleShowModal] = useState(false);
-  const [currentReceiver, setCurrentReceiver] = useState();
   const getConversations = async () => {
     let tmpConversation = await conversationApi
       .get(userId)
@@ -17,11 +20,11 @@ const Sidebar = (props) => {
         return res.data;
       })
       .catch((err) => console.log(err));
-    setConversations(tmpConversation);
+    onLoadData(tmpConversation);
   };
   useEffect(() => {
     getConversations();
-  }, []);
+  }, [userId, onLoadData]);
 
   const selectReceiver = (idx) => {
     console.log(idx);
@@ -30,6 +33,11 @@ const Sidebar = (props) => {
   return (
     <div className="">
       <h2>Chat</h2>
+      <div className="row justify-content-end p-3">
+        <Button className="col-12" onClick={() => toggleShowModal(true)}>
+          Create message
+        </Button>
+      </div>
       <div className="d-flex sidebar flex-column ">
         {conversations.map((friend, index) => {
           return (
@@ -43,14 +51,11 @@ const Sidebar = (props) => {
           );
         })}
       </div>
-      <div className="row justify-content-end p-3">
-        <Button className="col-12" onClick={() => toggleShowModal(true)}>
-          Create message
-        </Button>
-      </div>
+
       <Modal
         senderId={userId}
         showModal={showModal}
+        conversations={conversations}
         getConversations={getConversations}
         toggleShowModal={toggleShowModal}
       />

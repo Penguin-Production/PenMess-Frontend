@@ -18,15 +18,27 @@ const customStyles = {
   },
 };
 const Modal = (props) => {
-  const { showModal, toggleShowModal, senderId, getConversations } = props;
+  const {
+    showModal,
+    toggleShowModal,
+    senderId,
+    getConversations,
+    conversations,
+  } = props;
   const [receiverId, setReceiverId] = useState("");
   const onSubmit = (e) => {
     e.preventDefault();
+    toggleShowModal(false);
+    const existedReceiver = conversations.find(
+      (value) => value.members[1] === receiverId
+    );
+    if (existedReceiver) {
+      return;
+    }
     console.log(receiverId);
     conversationApi.post(senderId, receiverId);
     getConversations();
     setReceiverId();
-    toggleShowModal(false);
   };
   ReactModal.setAppElement("body");
   return (
