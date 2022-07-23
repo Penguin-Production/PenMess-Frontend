@@ -9,13 +9,13 @@ import socket from "./utils/socket";
 function App() {
   const [id, setId] = useState();
   const [mess, setMess] = useState([]);
-
-  useEffect(() => {
-    socket.on("connection", () => {
-      console.log(socket);
-      console.log("connected");
-    });
-  }, [socket]);
+  // const socketId = useRef();
+  // useEffect(() => {
+  //   socketId.current = socket.on("connection", () => {
+  //     console.log(socket);
+  //     console.log("connected");
+  //   });
+  // }, [socket]);
   return (
     <BrowserRouter>
       <Navigation />

@@ -12,13 +12,15 @@ const BaseChatBox = (props) => BoxWrapper(WrappedChatBox, props);
 BaseChatBox.propTypes = {
   isSender: PropsTypes.bool,
 };
-
 const ChatBox = (props) => {
-  const { message } = props;
+  const { message, userId } = props;
   return (
     // TODO: delete default value isSender
-    <BaseChatBox isSender={message.isSender}>
-      <MessageBox isSender={message.isSender} className="p-2 rounded-3">
+    <BaseChatBox isSender={userId === message.senderId ? true : false}>
+      <MessageBox
+        isSender={userId === message.senderId ? true : false}
+        className="p-2 rounded-3"
+      >
         {message.text}
       </MessageBox>
     </BaseChatBox>

@@ -27,7 +27,6 @@ const Sidebar = (props) => {
   }, [userId, onLoadData]);
 
   const selectReceiver = (idx) => {
-    console.log(idx);
     setCurrentReceiver(idx);
   };
   return (

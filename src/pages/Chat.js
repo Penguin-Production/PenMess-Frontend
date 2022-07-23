@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import Sidebar from "../components/Sidebar";
 import MessageForm from "../components/MessageForm";
 import { useSearchParams } from "react-router-dom";
 import usePersistedState from "./../utils/LocalStorageUtils/useLocalstrorage";
 import socket from "../utils/socket";
+import { current } from "@reduxjs/toolkit";
+import io from "socket.io-client";
 
 function Chat() {
   // let token = new URLSearchParams(window.location.search).get("token");
@@ -12,12 +14,11 @@ function Chat() {
   const [user, setUser] = usePersistedState("user");
   const [searchParams, setSearchParams] = useSearchParams();
   const [conversations, setConversations] = useState([]);
-  const [currentReceiver, setCurrentReceiver] = useState({
-    id: "",
-    messages: [],
-  });
+  const [currentReceiver, setCurrentReceiver] = useState(0);
   let [messages, setMessages] = useState([]);
+  const socketId = useRef();
   useEffect(() => {
+    socketId.current = io.connect(process.env.REACT_APP_API_URL);
     const getUser = async () => {
       const data = {};
       for (let key of searchParams.keys()) {
@@ -25,7 +26,7 @@ function Chat() {
       }
       if (data.id !== undefined) {
         setUser(data);
-        socket.emit("addUser", data.id);
+        socketId.current.emit("addUser", data.id);
       }
     };
 
@@ -33,19 +34,14 @@ function Chat() {
     //TODO: get message from a specific user
     const getMessages = async () => {};
     getUser();
-    socket.on("getMessage", (message) => {
-      console.log(conversations[currentReceiver].members[1]);
-      if (message.senderId === conversations[currentReceiver].members[1]) {
-        let tmp = messages;
-        tmp.push({
-          isSender: false,
-          text: message.text,
-        });
-        console.log(tmp);
-        setMessages(tmp);
-      }
+    socketId.current.on("getMessage", (message) => {
+      console.log(message);
+      setMessages((oldMess) => [...oldMess, message]);
+      // console.log(conversations[currentReceiver].members[1]);
+      // if (message.senderId === conversations[currentReceiver].members[1]) {
+      // }
     });
-  }, [searchParams, setUser, currentReceiver]);
+  }, []);
 
   return (
     <Container className="pt-3">
@@ -61,7 +57,12 @@ function Chat() {
           />
         </Col>
         <Col md={8} className="p-5 d-flex">
-          <MessageForm messages={messages} />
+          <MessageForm
+            messages={messages}
+            setMessages={setMessages}
+            socketRef={socketId}
+            conversation={conversations[currentReceiver]}
+          />
         </Col>
       </Row>
     </Container>
